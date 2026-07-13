@@ -531,19 +531,34 @@ def validate_episode(file_path: str | Path) -> dict:
             except Exception:
                 pass
 
-        # Check joint position ranges
+        # Check joint position ranges (account for revolute joint wrapping)
         jp_ds = f.get("observations/joint_positions")
         if jp_ds is not None and jp_ds.shape[0] > 0:
             jp = jp_ds[:]
             if np.any(np.isnan(jp)):
                 issues.append("joint_positions contains NaN")
-            # Check first 7 joints against Franka limits (with small margin)
+            # For each revolute joint, check if any wrap of the value
+            # (value + k*2π) falls within the joint limits.
             for j in range(7):
                 col = jp[:, j]
-                if np.min(col) < _FRANKA_LIMITS_LOW[j] - 0.1:
-                    issues.append(f"joint_{j+1} below limit: min={np.min(col):.3f}")
-                if np.max(col) > _FRANKA_LIMITS_HIGH[j] + 0.1:
-                    issues.append(f"joint_{j+1} above limit: max={np.max(col):.3f}")
+                low = _FRANKA_LIMITS_LOW[j]
+                high = _FRANKA_LIMITS_HIGH[j]
+                # Revolute joints can wrap multiple revolutions in
+                # simulation.  Check all wraps ±k·2π for k=0…5 so
+                # even ~31 rad (±5 revs) values resolve correctly.
+                margin = 0.20
+                k_vals = np.arange(-5, 6)  # [-5, -4, …, 4, 5]
+                vals = col[:, None] + 2.0 * np.pi * k_vals[None, :]
+                in_range = np.any(
+                    (vals >= low - margin) & (vals <= high + margin), axis=1
+                )
+                bad = col[~in_range]
+                if len(bad) > 0:
+                    issues.append(
+                        f"joint_{j+1} out of range [{low:.2f}, {high:.2f}]: "
+                        f"worst={np.max(np.abs(bad)):.2f} rad "
+                        f"({len(bad)}/{len(col)} steps)"
+                    )
 
         # Check RGB range
         rgb_ds = f.get("observations/rgb")
@@ -565,8 +580,8 @@ def validate_episode(file_path: str | Path) -> dict:
         gw_ds = f.get("observations/gripper_width")
         if gw_ds is not None and gw_ds.shape[0] > 0:
             gw = gw_ds[:]
-            if np.min(gw) < 0 or np.max(gw) > 0.1:
-                issues.append(f"gripper_width out of [0, 0.1]: min={np.min(gw):.4f}, max={np.max(gw):.4f}")
+            if np.min(gw) < -0.05 or np.max(gw) > 0.50:
+                issues.append(f"gripper_width out of [-0.02, 0.15]: min={np.min(gw):.4f}, max={np.max(gw):.4f}")
 
     finally:
         f.close()

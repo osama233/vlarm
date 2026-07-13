@@ -270,6 +270,14 @@ class IsaacEnv:
 
         self._move_cubes(self._cube_positions)
 
+        # Ensure timeline is playing after modifying stage prims.
+        # _move_cubes modifies USD prims directly which can invalidate
+        # physics tensor entities — play() re-initializes them.
+        import isaacsim.core.experimental.utils.app as _app_utils
+        _app_utils.play()
+        if self._app_update is not None:
+            self._app_update()
+
         # --- Reset robot to home ---
         self._franka.set_dof_position_targets(
             self.HOME_POSITION.reshape(1, -1),

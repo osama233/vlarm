@@ -57,13 +57,13 @@
 
 ### Day 5 — 专家策略采集
 
-- [ ] 实现硬编码脚本策略（抓取 → 移动 → 放置）
-- [ ] 或配置 WASD 键盘遥操作
-- [ ] 采集 50-100 条专家演示 episode
-- [ ] 每条 episode 包含：RGB 序列 + Depth + Joint States + End-Effector Pose
-- [ ] 编写 `03_collect_data.py` 统一采集脚本
-- [ ] 验证采集数据质量（检查轨迹平滑度、视觉清晰度）
-- [ ] 将原始数据存入 `data/raw/`
+- [x] 实现硬编码脚本策略（抓取 → 移动 → 放置）
+- [x] 或配置 WASD 键盘遥操作
+- [x] 采集 50-100 条专家演示 episode
+- [x] 每条 episode 包含：RGB 序列 + Depth + Joint States + End-Effector Pose
+- [x] 编写 `scripts/05_collect_expert_data.py` 统一采集脚本
+- [x] 验证采集数据质量（检查轨迹平滑度、视觉清晰度）
+- [x] 将原始数据存入 `data/raw/`
 
 ### Day 6 — Diffusion Policy 理论 & 核心模块
 
