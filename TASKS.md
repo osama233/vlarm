@@ -46,14 +46,14 @@
 
 ### Day 4 — 数据采集管道
 
-- [ ] 编写 `data/recorder.py` — 录制 RGB + Depth + Joint State
-- [ ] 定义数据格式：HDF5 存储 + JSON 元数据
-- [ ] 实现按 episode 录制（reset → actions → done）
-- [ ] 录制一个简单 episode 验证数据完整性
-- [ ] 编写 `data/dataset.py` — PyTorch Dataset 读取 HDF5
-- [ ] 实现数据验证函数（检查 shape、范围、时间戳）
-- [ ] 编写 `data/augmentation.py` — 数据增强（颜色抖动、随机裁剪等）
-- [ ] 测试 DataLoader 加载和增强流程
+- [x] 编写 `data/recorder.py` — 录制 RGB + Depth + Joint State
+- [x] 定义数据格式：HDF5 存储 + JSON 元数据
+- [x] 实现按 episode 录制（reset → actions → done）
+- [x] 录制一个简单 episode 验证数据完整性
+- [x] 编写 `data/dataset.py` — PyTorch Dataset 读取 HDF5
+- [x] 实现数据验证函数（检查 shape、范围、时间戳）
+- [x] 编写 `data/augmentation.py` — 数据增强（颜色抖动、随机裁剪等）
+- [x] 测试 DataLoader 加载和增强流程
 
 ### Day 5 — 专家策略采集
 
