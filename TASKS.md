@@ -67,26 +67,26 @@
 
 ### Day 6 — Diffusion Policy 理论 & 核心模块
 
-- [ ] 阅读 Diffusion Policy 论文（C. Chi et al., 2023）
-- [ ] 理解 DDPM / DDIM 原理（前向加噪 + 反向去噪）
-- [ ] 编写 `models/noise_scheduler.py` — 噪声调度器（linear / cosine）
-- [ ] 编写 `models/diffusion_policy.py` — U-Net 去噪网络
-- [ ] 编写 `models/vision_encoder.py` — ResNet-18 特征提取器
-- [ ] 实现条件注入机制（视觉特征 + 机器人状态 → U-Net）
-- [ ] 单元测试：验证 noise scheduler 的 forward/reverse
-- [ ] 单元测试：验证 diffusion policy 的输入输出 shape
+- [x] 阅读 Diffusion Policy 论文（C. Chi et al., 2023）
+- [x] 理解 DDPM / DDIM 原理（前向加噪 + 反向去噪）
+- [x] 编写 `models/noise_scheduler.py` — 噪声调度器（linear / cosine / squared_cosine）
+- [x] 编写 `models/diffusion_policy.py` — 1D Conv U-Net 去噪网络
+- [x] 编写 `models/vision_encoder.py` — ResNet-18 特征提取器 + FiLM
+- [x] 实现条件注入机制（视觉特征 + 机器人状态 → FiLM U-Net）
+- [x] 单元测试：验证 noise scheduler 的 forward/reverse/DDIM
+- [x] 单元测试：验证 diffusion policy 的输入输出 shape + 梯度 + 推理
+- [x] 端到端测试：用真实采集数据跑 5 步训练循环，loss 正常
 
 ### Day 7 — 训练管道
 
-- [ ] 编写 `configs/train_config.yaml` — 训练超参数
-- [ ] 编写 `configs/robot_config.yaml` — 机器人配置
-- [ ] 编写 `configs/task_config.yaml` — 任务配置
-- [ ] 编写 `utils/config.py` — 配置加载工具
-- [ ] 编写 `04_train.py` — 完整训练脚本
-- [ ] 集成 PyTorch Lightning（或纯 PyTorch 训练循环）
-- [ ] 集成 TensorBoard 日志（loss、learning rate、gradient norm）
-- [ ] 用随机数据跑通一个 epoch 验证 pipeline
-- [ ] 设置 checkpoint 保存策略
+- [x] 编写 `configs/train_config.yaml` — 训练超参数
+- [x] 编写 `configs/robot_config.yaml` — 机器人配置
+- [x] 编写 `configs/task_config.yaml` — 任务配置
+- [x] 编写 `utils/config.py` — 配置加载工具（dataclass + YAML + 命令行覆盖）
+- [x] 编写 `scripts/07_train.py` — 完整训练脚本（纯 PyTorch 训练循环）
+- [x] 集成 TensorBoard 日志（loss、learning rate、gradient norm、epoch_loss）
+- [x] 用真实数据跑通 3 epochs 验证 pipeline（57 episodes · 1170 samples）
+- [x] 设置 checkpoint 保存策略（best.pt + last.pt + epoch_N.pt + resume）
 
 ---
 
@@ -94,20 +94,24 @@
 
 ### Day 8 — 模型训练
 
-- [ ] 加载 Day 5 采集的专家数据
-- [ ] 划分训练集 / 验证集（80/20）
-- [ ] 设置训练超参数（batch_size=32, lr=1e-4, epochs=500）
-- [ ] 启动完整训练
-- [ ] 监控 loss 曲线和梯度状态
-- [ ] 观察过拟合/欠拟合，调参
-- [ ] 如果显存不足：减小 batch_size 到 16 或开启 gradient checkpointing
-- [ ] 保存最佳模型 checkpoint
+- [x] 加载 Day 5 采集的专家数据（67 ep → 过滤 10 → 57 正常 episodes）
+- [x] 划分训练集 / 验证集（80/20）
+- [x] 设置训练超参数（batch_size=64, lr=1e-4, epochs=306, cosine LR + warmup）
+- [x] 启动完整训练（306 epochs, ~49 min CPU, val_loss 0.102）
+- [x] 监控 loss 曲线和梯度状态（TensorBoard: loss/lr/grad_norm）
+- [x] 观察过拟合/欠拟合，调参（添加数据归一化 + DDPM 推理替代 DDIM）
+- [x] 保存最佳模型 checkpoint（checkpoints/20260713_165202/best.pt, val=0.102）
 
 ### Day 9 — 推理与评估
 
-- [ ] 编写 `05_eval.py` — 推理与评估脚本
-- [ ] 加载训练好的 checkpoint
-- [ ] 在 Isaac Sim 中运行推理（observation → action prediction）
+- [x] 编写 `scripts/09_rollout.py` — Isaac Sim 模型 rollout 脚本（文件 IPC 双进程）
+- [x] 编写 `scripts/09_model_server.py` — 模型推理服务（conda vlarm 端）
+- [x] 加载训练好的 checkpoint（epoch 415, val_loss=0.089）
+- [x] 在 Isaac Sim 中运行推理（observation → DDPM → action prediction）
+- [x] 实现 rollout 循环（receding horizon, 19 predictions/episode）
+- [x] 计算成功率（5 episodes, 0% — 无视觉模型无法定位方块）
+- [x] 记录失败案例（EE 直去目标垫，不靠近方块）
+- [x] 分析失败原因：训练数据无 cube 位置观测，模型学到固定轨迹
 - [ ] 实现 rollout 循环（每步执行动作，获取新观测）
 - [ ] 计算成功率（成功抓取并放置 / 总尝试次数）
 - [ ] 记录失败案例（碰撞、掉物体、未到达目标）

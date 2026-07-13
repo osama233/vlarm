@@ -1,0 +1,91 @@
+# ===========================================================================
+# VLARM — 任务配置 (Pick-and-Place)
+# ===========================================================================
+#
+# 定义操作任务的场景参数：目标物体、目标位置、语言指令模板等。
+#
+
+# ---------------------------------------------------------------------------
+# 任务类型
+# ---------------------------------------------------------------------------
+task:
+  name: "pick_and_place"
+  description: "Pick a cube from the table and place it on the target pad"
+  horizon: 200                  # 最大 episode 步数
+  success_distance: 0.05        # 方块到目标垫的成功判定距离（米）
+
+# ---------------------------------------------------------------------------
+# 场景物体
+# ---------------------------------------------------------------------------
+objects:
+  cubes:
+    - name: "cube_red"
+      color: "red"
+      size: [0.05, 0.05, 0.05]   # 5cm 方块
+      spawn_region:                # 随机生成范围
+        x: [ 0.40, 0.60]
+        y: [-0.20, 0.20]
+        z: 0.26                    # 桌面高度 + 半方块
+    - name: "cube_blue"
+      color: "blue"
+      size: [0.05, 0.05, 0.05]
+      spawn_region:
+        x: [ 0.40, 0.60]
+        y: [-0.20, 0.20]
+        z: 0.26
+    - name: "cube_green"
+      color: "green"
+      size: [0.05, 0.05, 0.05]
+      spawn_region:
+        x: [ 0.40, 0.60]
+        y: [-0.20, 0.20]
+        z: 0.26
+
+  target_pad:
+    position: [0.70, -0.18, 0.26]  # 目标垫中心
+    radius: 0.08                    # 目标垫半径
+    color: "white"
+
+# ---------------------------------------------------------------------------
+# 专家策略参数
+# ---------------------------------------------------------------------------
+expert:
+  approach_height: 0.12         # 从上方多少米接近方块
+  lift_height: 0.15             # 抓取后抬起高度
+  transport_height: 0.15        # 运输阶段保持高度
+  place_height: 0.08            # 放置阶段下降到离垫子高度
+  retract_height: 0.20          # 放置后的撤回高度
+  grasp_gripper: 0.0            # 抓取时夹爪宽度阈值（0 = 完全闭合）
+  open_gripper: 0.04            # 张开夹爪宽度
+  ik_scale: 0.5                 # DLS IK 步长缩放（0-1，越小越平滑）
+  settle_steps: 8               # 抓取/释放后的稳定步数
+  approach_threshold: 0.02      # 接近阶段完成阈值（米）
+  lift_threshold: 0.02          # 抬起阶段完成阈值（米）
+  transport_threshold: 0.03     # 运输阶段完成阈值（米）
+  place_threshold: 0.02         # 放置阶段完成阈值（米）
+  retract_threshold: 0.03       # 撤回阶段完成阈值（米）
+
+# ---------------------------------------------------------------------------
+# 语言指令模板（Day 10 使用）
+# ---------------------------------------------------------------------------
+language:
+  templates:
+    pick_red:    "Pick up the red cube and place it on the target pad"
+    pick_blue:   "Grasp the blue cube and put it on the white pad"
+    pick_green:  "Move the green cube to the target location"
+    generic:     "Pick and place the cube onto the pad"
+  embedding_model: "all-MiniLM-L6-v2"   # 计划使用的句子嵌入模型
+  embedding_dim: 384                     # 嵌入向量维度
+
+# ---------------------------------------------------------------------------
+# 相机配置（未来使用）
+# ---------------------------------------------------------------------------
+camera:
+  rgb:
+    width: 640
+    height: 480
+    fps: 30
+  depth:
+    width: 640
+    height: 480
+    fps: 30

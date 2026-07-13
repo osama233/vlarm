@@ -1,0 +1,86 @@
+# ===========================================================================
+# VLARM — 训练超参数配置
+# ===========================================================================
+#
+# 用于 ``scripts/07_train.py`` 的 Diffusion Policy 训练配置。
+# 可通过命令行 ``--config`` 覆盖默认值。
+#
+# 使用方式:
+#   python scripts/07_train.py                           # 使用此文件默认值
+#   python scripts/07_train.py --config train_large.yaml  # 覆盖配置
+#   python scripts/07_train.py --batch-size 64 --lr 1e-3  # 命令行覆盖单项
+#
+
+# ---------------------------------------------------------------------------
+# 扩散参数
+# ---------------------------------------------------------------------------
+diffusion:
+  num_train_steps: 100          # 训练时扩散步数 T
+  num_inference_steps: 16       # 推理时 DDIM 采样步数
+  schedule: "cosine"            # beta 调度: linear, cosine, squared_cosine
+
+# ---------------------------------------------------------------------------
+# 数据
+# ---------------------------------------------------------------------------
+data:
+  data_dir: "data/raw"          # HDF5 episode 目录
+  obs_horizon: 2                # 观测历史帧数
+  action_horizon: 16            # 预测的未来动作步数
+  action_downsample: 1          # 动作帧采样间隔
+  val_ratio: 0.2                # 验证集比例
+  exclude_episodes: [2, 6, 7, 13, 14, 22, 23, 46, 51, 66]  # 过滤掉的异常 episode
+
+# ---------------------------------------------------------------------------
+# 训练
+# ---------------------------------------------------------------------------
+training:
+  batch_size: 64                # 每批样本数
+  epochs: 200                   # 总训练 epoch 数
+  lr: 1.0e-4                    # 初始学习率
+  weight_decay: 1.0e-6          # AdamW 权重衰减
+  grad_clip_norm: 1.0           # 梯度裁剪最大范数
+  num_workers: 4                # DataLoader 并行进程数
+  use_amp: false                # 是否使用 AMP 混合精度（CPU 训练时禁用）
+  device: "auto"                # "cpu", "cuda", "cuda:0", 或 "auto"
+
+# ---------------------------------------------------------------------------
+# 学习率调度
+# ---------------------------------------------------------------------------
+lr_schedule:
+  name: "cosine"                # "cosine" | "step" | "plateau" | "none"
+  warmup_epochs: 5              # 预热 epoch 数
+  step_size: 50                 # StepLR 的步长（仅 step 模式）
+  step_gamma: 0.5               # StepLR 的衰减因子
+  plateau_patience: 15          # ReduceLROnPlateau 的耐心值
+  plateau_factor: 0.5           # ReduceLROnPlateau 的衰减因子
+
+# ---------------------------------------------------------------------------
+# 模型
+# ---------------------------------------------------------------------------
+model:
+  action_dim: 7                 # 动作维度（Franka 臂关节 = 7）
+  action_horizon: 16            # 与 data.action_horizon 一致
+  obs_horizon: 2                # 观测历史
+  state_dim: 13                 # 机器人状态维度（9+3+1 = 关节+EE位置+夹爪）
+  vision_output_dim: 512        # ResNet-18 视觉特征输出维度
+  state_output_dim: 256         # 状态编码器输出维度
+  time_dim: 128                 # 时间步嵌入维度
+  unet_base_channels: 64        # U-Net 基础通道数
+  use_vision: false             # 当前无真实相机数据，跳过视觉分支
+  pretrained_vision: false      # 是否使用 ImageNet 预训练权重
+
+# ---------------------------------------------------------------------------
+# 日志与保存
+# ---------------------------------------------------------------------------
+logging:
+  log_dir: "logs"               # TensorBoard 日志目录
+  checkpoint_dir: "checkpoints"  # 模型保存目录
+  save_every_epochs: 20         # 定期保存间隔（epoch）
+  save_best: true               # 是否保存验证 loss 最优 checkpoint
+  log_every_steps: 50           # 每隔多少步打印日志
+  eval_every_epochs: 5          # 每隔多少 epoch 进行一次验证
+
+# ---------------------------------------------------------------------------
+# 随机种子
+# ---------------------------------------------------------------------------
+seed: 42

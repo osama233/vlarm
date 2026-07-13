@@ -284,12 +284,19 @@ class EpisodicDataset:
     # Statistics
     # ------------------------------------------------------------------
 
-    def compute_statistics(self) -> dict[str, dict[str, float]]:
+    def compute_statistics(
+        self, skip_keys: tuple[str, ...] = ("rgb", "depth")
+    ) -> dict[str, dict[str, float]]:
         """Compute min/mean/max/std for each observation field.
 
         Returns a dict suitable for normalization::
 
             {"joint_positions": {"min": ..., "max": ..., "mean": ..., "std": ...}, ...}
+
+        Parameters
+        ----------
+        skip_keys : tuple of str
+            Keys to skip (e.g. images which are too large to accumulate).
         """
         accum: dict[str, list[np.ndarray]] = {}
 
@@ -299,6 +306,8 @@ class EpisodicDataset:
                 if T == 0:
                     continue
                 for key in self._obs_keys:
+                    if key in skip_keys:
+                        continue
                     ds_path = f"observations/{key}"
                     if ds_path in f:
                         arr = f[ds_path][:]
@@ -316,6 +325,57 @@ class EpisodicDataset:
                 "std": float(np.std(cat)),
             }
 
+        return stats
+
+    def compute_action_stats(self) -> dict[str, np.ndarray]:
+        """Compute mean and std of arm actions across all episodes.
+
+        Returns
+        -------
+        stats : dict
+            ``{"mean": ndarray (action_dim,), "std": ndarray (action_dim,)}``
+        """
+        all_actions = []
+        for file_idx in range(len(self._episode_files)):
+            with h5py.File(self._episode_files[file_idx], "r") as f:
+                acts = f["actions/joint_targets"][:, :7]  # arm DOF only
+                all_actions.append(acts)
+        cat = np.concatenate(all_actions, axis=0)
+        return {
+            "mean": np.mean(cat, axis=0).astype(np.float32),
+            "std": np.std(cat, axis=0).astype(np.float32),
+        }
+
+    def compute_obs_stats(
+        self, skip_keys: tuple[str, ...] = ("rgb", "depth")
+    ) -> dict[str, dict[str, np.ndarray]]:
+        """Compute per-key observation mean and std.
+
+        Returns
+        -------
+        stats : dict
+            ``{"joint_positions": {"mean": ..., "std": ...}, ...}``
+        """
+        accum: dict[str, list[np.ndarray]] = {}
+        for file_idx in range(len(self._episode_files)):
+            with h5py.File(self._episode_files[file_idx], "r") as f:
+                for key in self._obs_keys:
+                    if key in skip_keys:
+                        continue
+                    ds_path = f"observations/{key}"
+                    if ds_path in f:
+                        arr = f[ds_path][:]
+                        if key not in accum:
+                            accum[key] = []
+                        accum[key].append(arr.reshape(-1, arr.shape[-1]))
+
+        stats: dict[str, dict[str, np.ndarray]] = {}
+        for key, arrays in accum.items():
+            cat = np.concatenate(arrays, axis=0)
+            stats[key] = {
+                "mean": np.mean(cat, axis=0).astype(np.float32),
+                "std": np.std(cat, axis=0).astype(np.float32),
+            }
         return stats
 
     def close(self) -> None:
