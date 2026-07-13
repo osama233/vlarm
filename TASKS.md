@@ -23,14 +23,14 @@
 
 ### Day 2 — Isaac Sim + ROS2 桥接
 
-- [ ] 启动 Isaac Sim，验证 GUI 正常渲染
-- [ ] 加载 Franka Panda 机器人模型
-- [ ] 配置 Isaac Sim ROS2 Bridge 扩展
-- [ ] 编写 `ros2_bridge/action_pub.py` — 发布关节轨迹
-- [ ] 编写 `ros2_bridge/state_sub.py` — 订阅机器人状态
-- [ ] 编写 `ros2_bridge/camera_sub.py` — 订阅相机图像
-- [ ] 编写 `02_test_ros2_bridge.py` 桥接测试脚本
-- [ ] 跑通仿真 → ROS2 → 控制机器人移动的完整链路
+- [x] 启动 Isaac Sim，验证 GUI 正常渲染
+- [x] 加载 Franka Panda 机器人模型
+- [x] 配置 Isaac Sim ROS2 Bridge 扩展
+- [x] 编写 `ros2_bridge/action_pub.py` — 发布关节轨迹
+- [x] 编写 `ros2_bridge/state_sub.py` — 订阅机器人状态
+- [x] 编写 `ros2_bridge/camera_sub.py` — 订阅相机图像
+- [x] 编写 `02_test_ros2_bridge.py` 桥接测试脚本
+- [x] 跑通仿真 → ROS2 → 控制机器人移动的完整链路
 
 ### Day 3 — 任务场景搭建
 
