@@ -34,15 +34,15 @@
 
 ### Day 3 — 任务场景搭建
 
-- [ ] 在 Isaac Sim 中搭建桌面操作场景
-- [ ] 放置目标物体（红色方块、蓝色方块、绿色方块）
-- [ ] 放置目标容器（篮子）
-- [ ] 配置 Franka Panda 的初始位置和姿态
-- [ ] 添加 RGB 相机并配置视角
-- [ ] 添加 Depth 相机
-- [ ] 编写 `envs/task_scene.py` 场景加载代码
-- [ ] 编写 `envs/isaac_env.py` 环境封装（reset / step / close）
-- [ ] 验证场景可通过 Python 脚本加载和重置
+- [x] 在 Isaac Sim 中搭建桌面操作场景
+- [x] 放置目标物体（红色方块、蓝色方块、绿色方块）
+- [x] 放置目标容器（篮子）
+- [x] 配置 Franka Panda 的初始位置和姿态
+- [x] 添加 RGB 相机并配置视角
+- [x] 添加 Depth 相机
+- [x] 编写 `envs/task_scene.py` 场景加载代码
+- [x] 编写 `envs/isaac_env.py` 环境封装（reset / step / close）
+- [x] 验证场景可通过 Python 脚本加载和重置
 
 ### Day 4 — 数据采集管道
 
