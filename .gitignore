@@ -1,0 +1,61 @@
+# ============================================
+# VLARM .gitignore
+# ============================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# --- Virtual Environment / conda ---
+venv/
+.venv/
+env/
+*.conda
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# --- Project Data (large files) ---
+data/raw/
+data/processed/
+checkpoints/
+logs/
+*.h5
+*.hdf5
+
+# --- pip / cache ---
+.cache/
+.pip/
+
+# --- Isaac Sim ---
+IsaacSim-6.0.1/
+isaac-sim-standalone-*
+*.zip
+*.tar.gz
+*.run
+
+# --- ROS2 ---
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# --- Misc ---
+.env
+*.log
+wandb/

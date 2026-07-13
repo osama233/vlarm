@@ -1,0 +1,31 @@
+# VLARM - Python Dependencies
+# Core
+torch>=2.5.0
+torchvision>=0.20.0
+torchaudio>=2.5.0
+pytorch-lightning>=2.0.0
+
+# Data
+h5py>=3.10.0
+numpy>=1.26.0
+opencv-python>=4.10.0
+pillow>=10.0.0
+
+# Vision & Language
+transformers>=4.40.0
+open-clip-torch>=2.24.0
+
+# ROS2 (Python bindings)
+# ros-jazzy-desktop installed via apt
+
+# Utilities
+pyyaml>=6.0
+tensorboard>=2.14.0
+matplotlib>=3.8.0
+tqdm>=4.66.0
+rich>=13.0.0
+
+# Dev
+pytest>=8.0.0
+black>=24.0.0
+ruff>=0.4.0
